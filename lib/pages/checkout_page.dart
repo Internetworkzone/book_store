@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo/database/database.dart';
 import 'package:demo/pages/order_page.dart';
+import 'package:demo/services/constants.dart';
 import 'package:demo/state/cart_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -39,11 +40,9 @@ class _CheckoutState extends State<Checkout> {
   Widget build(BuildContext context) {
     final cart = Provider.of<CartState>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Checkout'),
-      ),
+      appBar: AppBar(title: Text('Checkout')),
       body: cart.bookList.isEmpty
-          ? Center(child: Text('You did not add anything yet'))
+          ? Center(child: Text('Your cart is empty'))
           : StreamBuilder<DocumentSnapshot>(
               stream: getCartDetails(),
               builder: (context, snapshot) {
@@ -79,33 +78,47 @@ class _CheckoutState extends State<Checkout> {
                       );
               },
             ),
-      persistentFooterButtons: <Widget>[
-        Text(
-          '₹ ' + cart.total.toString(),
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        SizedBox(width: 100),
-        AbsorbPointer(
-          absorbing: cart.bookList.length == 0,
-          child: RaisedButton(
-            color: cart.bookList.length == 0 ? Colors.grey : Colors.green,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
-              child: Text(
-                'Place order',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
+      bottomNavigationBar: BottomAppBar(
+          elevation: 10,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 23.0),
+                child: Text(
+                  '₹ ' + cart.total.toString(),
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-            ),
-            onPressed: () => placeOrder(),
-          ),
-        )
-      ],
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                child: AbsorbPointer(
+                  absorbing: cart.bookList.length == 0,
+                  child: RaisedButton(
+                    color:
+                        cart.bookList.length == 0 ? Colors.grey : Colors.green,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 10),
+                      child: Text(
+                        'Place order',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: white,
+                        ),
+                      ),
+                    ),
+                    onPressed: () => placeOrder(),
+                  ),
+                ),
+              ),
+            ],
+          )),
     );
   }
 }

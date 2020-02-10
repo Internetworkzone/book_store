@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo/database/database.dart';
 import 'package:demo/pages/admin.dart';
 import 'package:demo/pages/checkout_page.dart';
+import 'package:demo/pages/search_screen.dart';
 import 'package:demo/state/cart_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,9 +22,10 @@ class _HomePageState extends State<HomePage> {
     cart.priceList.add(price);
 
     updateCart(
-        bookNames: cart.bookList,
-        bookPrices: cart.priceList,
-        total: cart.total);
+      bookNames: cart.bookList,
+      bookPrices: cart.priceList,
+      total: cart.total,
+    );
   }
 
   getCartList() {
@@ -34,6 +36,10 @@ class _HomePageState extends State<HomePage> {
       cart.priceList = doc.data['price'];
       cart.total = doc.data['total'];
     }).catchError((onError) {});
+  }
+
+  search() {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => SearchScreen()));
   }
 
   @override
@@ -51,6 +57,15 @@ class _HomePageState extends State<HomePage> {
           title: Text('The Book Store'),
           actions: <Widget>[
             Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: IconButton(
+                icon: Icon(Icons.search),
+                iconSize: 30,
+                color: Colors.white,
+                onPressed: () => search(),
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 7),
               child: Stack(
                 children: <Widget>[
@@ -66,7 +81,7 @@ class _HomePageState extends State<HomePage> {
                   Positioned(
                     right: 1,
                     child: Container(
-                      padding: EdgeInsets.all(cart.length == 0 ? 0 : 4),
+                      padding: EdgeInsets.all(cart.length == 0 ? 0 : 2.3),
                       child: Text(
                         cart.length == 0 ? '' : cart.length.toString(),
                         style: TextStyle(
@@ -82,6 +97,15 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: IconButton(
+                icon: Icon(Icons.person),
+                iconSize: 30,
+                color: Colors.white,
+                onPressed: () {},
               ),
             ),
           ],
@@ -105,7 +129,11 @@ class _HomePageState extends State<HomePage> {
                         int price =
                             snapshot2.data.documents[index].data['price'];
 
-                        return Card(
+                        return Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                            color: Color(0xffdddddd),
+                          )),
                           child: GridTile(
                             child: Column(
                               children: <Widget>[
@@ -135,7 +163,6 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ),
-                          elevation: 5,
                         );
                       });
             },
@@ -157,7 +184,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 RaisedButton(
-                    child: Text('Add Book'),
+                    child: Text('Add Books'),
                     onPressed: () {
                       Navigator.pop(context);
 

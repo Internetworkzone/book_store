@@ -38,5 +38,14 @@ updateOrder({List bookList, List priceList, int total}) {
     'books': bookList,
     'prices': priceList,
     'total': total,
+    'timesStamp': FieldValue.serverTimestamp(),
   });
+}
+
+Future<QuerySnapshot> searchBooks({String name}) {
+  Future<QuerySnapshot> result = firestore
+      .collection('books')
+      .where('name', isGreaterThanOrEqualTo: name)
+      .getDocuments();
+  return result;
 }
