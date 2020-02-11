@@ -68,16 +68,16 @@ class _SearchScreenState extends State<SearchScreen> {
                         itemBuilder: (context, index) {
                           String bookName =
                               snapshot.data.documents[index].data['name'];
-                          int bookPrice =
-                              snapshot.data.documents[index]['price'];
+                          String bookId =
+                              snapshot.data.documents[index].documentID;
+
                           return ListTile(
                               title: Text(bookName),
                               onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => ProductPage(
-                                        bookName: bookName,
-                                        bookPrice: bookPrice,
+                                        bookId: bookId,
                                       ),
                                     ),
                                   ));

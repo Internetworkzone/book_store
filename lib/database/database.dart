@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 Firestore firestore = Firestore.instance;
 
-addBook({String bookName, int price}) {
+addBook({String bookName, int price, String url}) {
   firestore.collection('books').add({
     'name': bookName ?? '',
     'price': price ?? '',
+    'image': url,
   });
 }
 
@@ -48,4 +49,8 @@ Future<QuerySnapshot> searchBooks({String name}) {
       .where('name', isGreaterThanOrEqualTo: name)
       .getDocuments();
   return result;
+}
+
+Future<DocumentSnapshot> getProductDetails(String bookId) async {
+  return await firestore.collection('books').document(bookId).get();
 }

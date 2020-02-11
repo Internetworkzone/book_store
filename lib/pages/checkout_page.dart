@@ -36,11 +36,22 @@ class _CheckoutState extends State<Checkout> {
     cart.total = 0;
   }
 
+  double perfectSize(double size) {
+    return MediaQuery.of(context).size.width / 100 / 3.9272727272727277 * size;
+  }
+
+  double perfectHeight(double size) {
+    return MediaQuery.of(context).size.height / 100 / 7.374545454545455 * size;
+  }
+
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartState>(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Checkout')),
+      appBar: AppBar(
+        title: Text('Checkout'),
+        backgroundColor: Color(0xff5c6bc0),
+      ),
       body: cart.bookList.isEmpty
           ? Center(child: Text('Your cart is empty'))
           : StreamBuilder<DocumentSnapshot>(
@@ -57,7 +68,7 @@ class _CheckoutState extends State<Checkout> {
                             child: ListTile(
                               title: Text(
                                 book,
-                                style: TextStyle(fontSize: 25),
+                                style: TextStyle(fontSize: perfectSize(25)),
                               ),
                               leading: IconButton(
                                 padding: EdgeInsets.all(0),
@@ -70,7 +81,7 @@ class _CheckoutState extends State<Checkout> {
                               ),
                               trailing: Text(
                                 '₹ ' + price.toString(),
-                                style: TextStyle(fontSize: 25),
+                                style: TextStyle(fontSize: perfectSize(25)),
                               ),
                             ),
                           );
@@ -79,46 +90,45 @@ class _CheckoutState extends State<Checkout> {
               },
             ),
       bottomNavigationBar: BottomAppBar(
-          elevation: 10,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 23.0),
-                child: Text(
-                  '₹ ' + cart.total.toString(),
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: AbsorbPointer(
-                  absorbing: cart.bookList.length == 0,
-                  child: RaisedButton(
-                    color:
-                        cart.bookList.length == 0 ? Colors.grey : Colors.green,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 10),
-                      child: Text(
-                        'Place order',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: white,
-                        ),
-                      ),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          SizedBox(
+            width: perfectSize(3),
+          ),
+          Text(
+            '₹ ' + cart.total.toString(),
+            style: TextStyle(
+              fontSize: perfectSize(30),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: perfectSize(15), vertical: perfectHeight(10)),
+            child: AbsorbPointer(
+              absorbing: cart.bookList.length == 0,
+              child: RaisedButton(
+                color:
+                    cart.bookList.length == 0 ? Colors.grey : Color(0xff00bfa5),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: perfectSize(15), vertical: perfectHeight(10)),
+                  child: Text(
+                    'Place order',
+                    style: TextStyle(
+                      fontSize: perfectSize(22),
+                      fontWeight: FontWeight.w700,
+                      color: white,
                     ),
-                    onPressed: () => placeOrder(),
                   ),
                 ),
+                onPressed: () => placeOrder(),
               ),
-            ],
-          )),
+            ),
+          ),
+        ],
+      )),
     );
   }
 }

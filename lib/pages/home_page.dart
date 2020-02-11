@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo/database/database.dart';
 import 'package:demo/pages/admin.dart';
 import 'package:demo/pages/checkout_page.dart';
+import 'package:demo/pages/product_page.dart';
 import 'package:demo/pages/search_screen.dart';
+import 'package:demo/services/constants.dart';
 import 'package:demo/state/cart_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,8 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int cartCount = 0;
-  addItems({String name, int price}) {
+  addItemToCart({String name, int price}) {
     final cart = Provider.of<CartState>(context, listen: false);
 
     cart.total = cart.total + price;
@@ -48,29 +49,39 @@ class _HomePageState extends State<HomePage> {
     getCartList();
   }
 
+  double perfectSize(double size) {
+    return MediaQuery.of(context).size.width / 100 / 3.9272727272727277 * size;
+  }
+
+  double perfectHeight(double size) {
+    return MediaQuery.of(context).size.height / 100 / 7.374545454545455 * size;
+  }
+
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartState>(context).bookList;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Color(0xff5c6bc0),
           title: Text('The Book Store'),
           actions: <Widget>[
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: perfectHeight(12)),
               child: IconButton(
                 icon: Icon(Icons.search),
-                iconSize: 30,
+                iconSize: perfectSize(30),
                 color: Colors.white,
                 onPressed: () => search(),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 7),
+              padding: EdgeInsets.symmetric(
+                  vertical: perfectHeight(12), horizontal: perfectSize(7)),
               child: Stack(
                 children: <Widget>[
                   IconButton(
-                    icon: Icon(Icons.shopping_cart, size: 30),
+                    icon: Icon(Icons.shopping_cart, size: perfectSize(30)),
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -81,7 +92,8 @@ class _HomePageState extends State<HomePage> {
                   Positioned(
                     right: 1,
                     child: Container(
-                      padding: EdgeInsets.all(cart.length == 0 ? 0 : 2.3),
+                      padding: EdgeInsets.all(
+                          perfectSize(cart.length == 0 ? 0 : 2.3)),
                       child: Text(
                         cart.length == 0 ? '' : cart.length.toString(),
                         style: TextStyle(
@@ -92,7 +104,8 @@ class _HomePageState extends State<HomePage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
-                        border: Border.all(width: cart.length == 0 ? 0 : 3),
+                        border: Border.all(
+                            width: perfectSize(cart.length == 0 ? 0 : 3)),
                       ),
                     ),
                   ),
@@ -100,13 +113,12 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: perfectSize(12)),
               child: IconButton(
-                icon: Icon(Icons.person),
-                iconSize: 30,
-                color: Colors.white,
-                onPressed: () {},
-              ),
+                  icon: Icon(Icons.person),
+                  iconSize: perfectSize(30),
+                  color: Colors.white,
+                  onPressed: () {}),
             ),
           ],
         ),
@@ -121,46 +133,96 @@ class _HomePageState extends State<HomePage> {
                   : GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
+                        childAspectRatio: 0.6,
                       ),
                       itemCount: snapshot2.data.documents.length,
                       itemBuilder: (context, index) {
-                        String book =
+                        String bookName =
                             snapshot2.data.documents[index].data['name'];
-                        int price =
+                        int bookPrice =
                             snapshot2.data.documents[index].data['price'];
+                        String bookImage =
+                            snapshot2.data.documents[index].data['image'];
+                        String bookId =
+                            snapshot2.data.documents[index].documentID;
 
-                        return Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                            color: Color(0xffdddddd),
-                          )),
-                          child: GridTile(
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(height: 15),
-                                Text(
-                                  book,
-                                  style: TextStyle(fontSize: 30),
+                        return GestureDetector(
+                          child: Card(
+                            elevation: 0,
+                            borderOnForeground: false,
+                            margin: EdgeInsets.all(perfectSize(3)),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                color: Color(0xffdddddd),
+                              )),
+                              child: GridTile(
+                                child: Column(
+                                  children: <Widget>[
+                                    SizedBox(height: perfectHeight(15)),
+                                    Container(
+                                      child: bookImage == null
+                                          ? Icon(
+                                              Icons.photo,
+                                              size: perfectSize(150),
+                                            )
+                                          : Image(
+                                              image: NetworkImage(bookImage),
+                                              fit: BoxFit.contain,
+                                            ),
+                                      height: perfectHeight(225),
+                                      width: perfectSize(150),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                                footer: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      bookName.length > 20
+                                          ? bookName.substring(0, 20) + '...'
+                                          : bookName,
+                                      style: TextStyle(
+                                          color: black,
+                                          fontSize: perfectSize(18),
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: <Widget>[
+                                        Text(
+                                          '₹ ${bookPrice.toString()}',
+                                          style: TextStyle(
+                                            fontSize: perfectSize(20),
+                                            color: black,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        FlatButton(
+                                          padding: EdgeInsets.all(0),
+                                          child: Text(
+                                            'Add to cart',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          onPressed: () => addItemToCart(
+                                              name: bookName, price: bookPrice),
+                                          color: Color(0xff00bfa5),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: perfectHeight(5)),
+                                  ],
+                                ),
+                              ),
                             ),
-                            footer: Column(
-                              children: <Widget>[
-                                Text(
-                                  '₹ ${price.toString()}',
-                                  style: TextStyle(fontSize: 20),
-                                ),
-                                FlatButton(
-                                  child: Text(
-                                    'Add to cart',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  onPressed: () =>
-                                      addItems(name: book, price: price),
-                                  color: Colors.blue,
-                                ),
-                                SizedBox(height: 5),
-                              ],
+                          ),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProductPage(
+                                bookId: bookId,
+                              ),
                             ),
                           ),
                         );
@@ -179,7 +241,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             height: 240,
             width: MediaQuery.of(context).size.width,
-            color: Colors.blue,
+            color: Color(0xff00bfa5),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
